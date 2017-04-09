@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!DOCTYPE question-paper 
+[
+	<!ELEMENT question-paper (question+)>
+	<!ELEMENT question (#PCDATA)>
+	<!ATTLIST question id ID #REQUIRED>
+]>
+<question-paper>
+	<question id="q1">What is DOM?</question>
+	<question id="q2">What are leaves?</question>
+</question-paper>

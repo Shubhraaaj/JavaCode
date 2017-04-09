@@ -1,0 +1,35 @@
+package Threads;
+import java.io.*;
+class Sender extends Thread {
+    PipedOutputStream output;
+    Sender(PipedOutputStream o ) {this.output = o;}
+    public void run() {
+        try {
+            while(true) {
+                int v = (int)(Math.random()*100);
+                System.out.println("Sent: "+v);
+                output.write(v);
+                Thread.sleep(1000);
+            }
+        }catch(Exception e) {}
+    }
+}
+class Receiver extends Thread {
+    PipedInputStream input;
+    Receiver(PipedInputStream i ) {this.input = i;}
+    public void run() {
+        try {
+            while(true) {
+                System.out.println("Received: " + input.read());
+            }
+        }catch(Exception e) {}
+    }
+}
+public class PipeDemo {
+    public static void main(String args[]) throws IOException {
+        PipedOutputStream out = new PipedOutputStream();
+        PipedInputStream in = new PipedInputStream(out);
+        new Receiver(in).start();
+        new Sender(out).start();
+    }
+}
