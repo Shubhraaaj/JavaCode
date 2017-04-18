@@ -1,0 +1,78 @@
+package JavaMail;
+
+import javax.activation.DataHandler;
+import javax.activation.FileDataSource;
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+import javax.swing.*;
+import java.io.File;
+import java.util.Properties;
+import java.util.Scanner;
+
+public class Gmailer
+{
+    public static void main(String args[])
+    {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("ENTER THE EMAIL ID OF THE RECIPIENT");
+        String receiver = scanner.nextLine();
+        System.out.println("ENTER THE SUBJECT FOR THE MAIL");
+        String subject = scanner.nextLine();
+        System.out.println("ENTER THE CONTENT OF THE MAIL");
+        String content = scanner.nextLine();
+        String attachment_path="", path_attach="";
+        System.out.println("DO YOU WANT TO ADD A FILE");
+        String status = scanner.nextLine();
+        if(status == "Yes")
+        {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.showOpenDialog(null);
+            File file = fileChooser.getSelectedFile();
+            attachment_path = file.getAbsolutePath();
+            System.out.println("ENTER NAME OF ATTACHMENT");
+            path_attach = scanner.nextLine();
+        }
+        Properties prop = new Properties();
+        prop.put("mail.smtp.host", "smtp.gmail.com");
+        prop.put("mail.smtp.socketFactory.port","465");
+        prop.put("mail.smtp.socketFactory.class","javax.net.ssl.SSLSocketFactory");
+        prop.put("mail.smtp.auth","true");
+        prop.put("mail.smtp.port", "465");
+
+        Session session = Session.getDefaultInstance(prop,
+                new javax.mail.Authenticator()
+                {
+                    protected PasswordAuthentication getPasswordAuthentication()
+                    {
+                        return new PasswordAuthentication("xyz@gmail.com", "password");
+                    }
+                });
+        try
+        {
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress("xyz@gmail.com"));
+            //To Send to multiple email addresses just go on adding commas and InternetAddress.parse(email@gmail.com);
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(receiver));
+            message.setSubject(subject);
+            //message.setText(content);
+            MimeBodyPart mimeBodyPart = new MimeBodyPart();
+            mimeBodyPart.setText(content);
+            Multipart multipart = new MimeMultipart();
+            multipart.addBodyPart(mimeBodyPart);
+            mimeBodyPart = new MimeBodyPart();
+            javax.activation.DataSource source = new FileDataSource(attachment_path);
+            mimeBodyPart.setDataHandler(new DataHandler(source));
+            mimeBodyPart.setFileName(path_attach);
+            message.setContent(multipart);
+            Transport.send(message);
+            System.out.println("Mailed to "+receiver);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+}
